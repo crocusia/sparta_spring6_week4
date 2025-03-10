@@ -18,7 +18,9 @@ public class Menu {
     public String getCategory(){
         return this.category;
     }
-
+    public Integer getListSize(){
+        return this.menuList.size();
+    }
     //setter
     public void addMenu(MenuItem item){
         this.menuList.add(item);
