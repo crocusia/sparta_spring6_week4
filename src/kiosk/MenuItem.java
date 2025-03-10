@@ -3,7 +3,7 @@ package kiosk;
 import javax.lang.model.type.NullType;
 
 public class MenuItem {
-    //캡슐화
+    //캡슐화 - 이름, 가격, 설명 필드
     private String name;
     private Double price;
     private String description;
