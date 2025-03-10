@@ -1,5 +1,6 @@
 package kiosk;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Menu {
@@ -9,6 +10,7 @@ public class Menu {
     //생성자
     public Menu(String category){
         this.category = category;
+        menuList = new ArrayList<>();
     }
 
     //getter
