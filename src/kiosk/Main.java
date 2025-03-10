@@ -18,8 +18,14 @@ public class Main {
 
         Menu dessertMenu = new Menu("Desserts");
         dessertMenu.addMenu(new MenuItem("Anion Ring", 2.5, "양파를 통째로 튀긴 어니언링"));
+
         //Kiosk 객체 생성
         Kiosk kiosk = new Kiosk();
+        //Menu를 Kiost의 Menu 리스트에 저장
+        kiosk.addCategory(burgerMenu);
+        kiosk.addCategory(drinkMenu);
+        kiosk.addCategory(dessertMenu);
+        //키오스크 프로그램 시작
         kiosk.start();
     }
 }
