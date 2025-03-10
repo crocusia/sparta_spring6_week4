@@ -10,9 +10,12 @@ public class Main {
     }
     public static void printMenuItem(int index, MenuItem item){
         String name = item.getName();
-        String price = item.getPrice().toString();
+        Double price = item.getPrice();
         String desc = item.getDescription();
-        System.out.println(index + ". " + "{:<14} | W {:<3} | {}".format(name, price, desc));
+        System.out.printf("%d. %-15s| W %.1f | %s%n", index, name, price, desc);
+    }
+    public static void printExit(){
+        System.out.println("0. 종료");
     }
     public static void main(String[] args){
         Menu burgerMenu = new Menu("Burger");
@@ -22,9 +25,9 @@ public class Main {
         burgerMenu.addMenu(new MenuItem("Hamburger", 5.4, "비프패티를 기반으로 야채가 들어간 기본버거"));
 
         printTitle("SHAKESHACK MENU");
-        int size = burgerMenu.getListSize();
-        for(int i = 1; i < size+1; i++){
-            printMenuItem(i%size, burgerMenu.getMenuItem(i-1));
+        for(int i = 1; i < burgerMenu.getListSize()+1; i++){
+            printMenuItem(i, burgerMenu.getMenuItem(i-1));
         }
+        printExit();
     }
 }
