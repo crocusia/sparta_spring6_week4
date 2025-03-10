@@ -5,22 +5,6 @@ import jdk.jshell.SourceCodeAnalysis;
 import java.util.Scanner;
 
 public class Main {
-    //제목 출력 메서드
-    public static void printTitle(String title){
-        System.out.println("[ " + title + " ]");
-    }
-    //MenuItem 출력 메서드
-    public static void printMenuItem(int index, MenuItem item){
-        String name = item.getName();
-        Double price = item.getPrice();
-        String desc = item.getDescription();
-        System.out.printf("%d. %-15s| W %.1f | %s%n", index, name, price, desc);
-    }
-    //종료 여부 출력 메서드
-    public static void printExit(){
-        System.out.println("0. 종료");
-    }
-
     public static void main(String[] args){
         //Menu 객체 생성 및 MenuItem 객체 생성 후 리스트에 add
         Menu burgerMenu = new Menu("Burger");
@@ -34,13 +18,6 @@ public class Main {
         int choice = 0;
         //반복문을 이용해 0 입력 시, 프로그램 종료
         do{
-            //메뉴 리스트 출력
-            printTitle("SHAKESHACK MENU");
-            for(int i = 1; i < burgerMenu.getListSize()+1; i++){
-                printMenuItem(i, burgerMenu.getMenuItem(i-1));
-            }
-            printExit();
-
             //입력 받기
             choice = input.nextInt();
             //개행 문자 제거
