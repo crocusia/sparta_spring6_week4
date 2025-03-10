@@ -25,11 +25,11 @@ public class Kiosk {
         System.out.printf("%-15s| W %.1f | %s%n", name, price, desc);
     }
 
-    public void printList(String title, Menu menu){
+    public void printList(String title){
         System.out.println("[ " + title + " ]");
-        for(int i = 1; i < menu.getListSize()+1; i++){
+        for(int i = 1; i < menuItems.size()+1; i++){
             System.out.printf("%d. ", i);
-            printMenuItem(menu.getMenuItem(i-1));
+            printMenuItem(menuItems.get(i-1));
         }
         System.out.println("0. 종료");
     }
@@ -41,6 +41,8 @@ public class Kiosk {
         //반복문을 이용해 0 입력 시, 프로그램 종료
         try {
             do {
+                //출력
+                printList("SHAKESHACK MENU");
                 //입력 받기 & 개행 문자 제거
                 choice = input.nextInt();
                 input.nextLine();
