@@ -59,11 +59,22 @@ public class Kiosk {
         System.out.printf("%d. %-15s| %s%n", category.size()+1, "Orders", "장바구니를 확인 후 주분합니다.");
         System.out.printf("%d. %-15s| %s%n", category.size()+2, "Cancel", "진행중인 주문을 취소합니다.");
     }
+
     public void askToAddToCart(){
         System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
         System.out.println("1. 확인    2. 취소");
     }
 
+    public void checkOrder(){
+        System.out.println("아래와 같이 주문하시겠습니까?");
+        System.out.println("[ " + "Orders" + " ]");
+        for(int i = 0; i < cart.getCartSizes(); i++){
+            printMenuItem(cart.getCartItem(i));
+        }
+        System.out.println("[ " + "Total" + " ]");
+        System.out.printf("W %.1f%n%n", cart.getTotalPrice());
+        System.out.println("1. 주문    2. 메뉴판");
+    }
     //main에서 관리하던 입력과 반복문 로직 관리
     public void start(){
         Scanner input = new Scanner(System.in);
@@ -83,8 +94,18 @@ public class Kiosk {
                         }
                         break;
                     case 2 : //카테고리 내의 메뉴 선택 단계
-                        categoryIndex = choice - 1;
-                        printMenuList(category.get(categoryIndex));
+                        if(choice != 0) {
+                            if(choice <= category.size()){
+                                categoryIndex = choice - 1;
+                                printMenuList(category.get(categoryIndex));
+                            }
+                            else if(choice <= category.size()+2){
+                                checkOrder();
+                            }
+                            else{
+                                throw new IndexOutOfBoundsException();
+                            }
+                        }
                         break;
                     case 3 : //선택 메뉴 출력 및 장바구니에 넣을 건지 묻기
                         if(choice > category.get(categoryIndex).getListSize()){

@@ -16,6 +16,13 @@ public class Cart {
     public MenuItem getCartItem(int index){
         return this.saveCart.get(index);
     }
+    public double getTotalPrice(){
+        double total = 0.0;
+        for(int i = 0; i < saveCart.size(); i++){
+            total += saveCart.get(i).getPrice();
+        }
+        return total;
+    }
     //setter
     public void addItemToCart(MenuItem item){
         this.saveCart.add(item);
