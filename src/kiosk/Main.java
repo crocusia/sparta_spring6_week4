@@ -27,5 +27,7 @@ public class Main {
         kiosk.addCategory(dessertMenu);
         //키오스크 프로그램 시작
         kiosk.start();
+
+
     }
 }
