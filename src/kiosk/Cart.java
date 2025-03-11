@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
-    private boolean cartStatus;
     private List<MenuItem> saveCart;
     //생성자
     public Cart(){
         this.saveCart = new ArrayList<>();
-        this.cartStatus = false;
     }
     //getter
     public int getCartSizes(){
