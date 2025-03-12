@@ -14,15 +14,16 @@ public class Menu {
     }
 
     //getter
-    public MenuItem getMenuItem(int index){
-        return this.menuList.get(index);
-    }
     public String getCategory(){
         return this.category;
     }
     public Integer getListSize(){
         return this.menuList.size();
     }
+    public MenuItem getMenuItem(int index){
+        return this.menuList.get(index);
+    }
+
     //setter
     public void addMenu(MenuItem item){
         this.menuList.add(item);

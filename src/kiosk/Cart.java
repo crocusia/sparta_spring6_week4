@@ -10,7 +10,7 @@ public class Cart {
         this.saveCart = new ArrayList<>();
     }
     //getter
-    public int getCartSizes(){
+    public int getCartSize(){
         return this.saveCart.size();
     }
     public MenuItem getCartItem(int index){
