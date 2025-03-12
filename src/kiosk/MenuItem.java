@@ -5,11 +5,11 @@ import javax.lang.model.type.NullType;
 public class MenuItem {
     //캡슐화 - 이름, 가격, 설명 필드
     private String name;
-    private Double price;
+    private double price;
     private String description;
 
     //생성자
-    public MenuItem(String name, Double price, String description){
+    public MenuItem(String name, double price, String description){
         this.name = name;
         this.price = price;
         this.description = description;
@@ -19,7 +19,7 @@ public class MenuItem {
     public String getName(){
         return this.name;
     }
-    public Double getPrice(){
+    public double getPrice(){
         return this.price;
     }
     public String getDescription(){
