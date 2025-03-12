@@ -72,7 +72,7 @@ public class Kiosk {
                 for (int i = 0; i < cart.getCartSize(); i++) {
                     cart.getCartItem(i).printMenuItemInfo();
                 }
-                System.out.println("%n[ " + "Total" + " ]");
+                System.out.println("[ " + "Total" + " ]");
                 System.out.printf("W %.1f%n%n", cart.getTotalPrice());
                 System.out.println("1. 주문    2. 메뉴판");
             } else if (categoryIndex == category.size() + 2) {
@@ -91,7 +91,12 @@ public class Kiosk {
     public void step3(int categoryIndex, int menuItemIndex) {
         if (isOrdering) {
             //결제 시 할인 정보 입력
-            System.out.println("할인 정보를 입력하세요,");
+            System.out.println("할인 정보를 입력해주세요.");
+            int i = 1;
+            for(DiscountType discountType : DiscountType.values()){
+                System.out.printf("%d. %-7s : %d%%%n", i, discountType.getName(), discountType.getRate());
+                i++;
+            }
         } else {
             //선택된 주문 출력 후, 장바구니에 추가할지 여부 묻기
             category.get(categoryIndex).getMenuItem(menuItemIndex).printMenuItemInfo();
@@ -103,8 +108,8 @@ public class Kiosk {
     //step 4: 장바구니에 넣기 or 결제하기
     public void step4(int choice) {
         if (isOrdering) {
-            //결제하기
-            //할인을 완료한 최종 결제 금액 출력
+            //할인이 적용된 금액에 따라 결제
+            cart.applyDiscount(DiscountType.fromIndex(choice-1).getRate());
             System.out.printf("주문이 완료되었습니다. 금액은 W %.1f 입니다.%n", cart.getTotalPrice());
             isProcessing = false;
         } else {
