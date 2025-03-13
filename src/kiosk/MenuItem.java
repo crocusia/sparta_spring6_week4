@@ -38,7 +38,8 @@ public class MenuItem {
     }
 
     //출력
-    public void printMenuItemInfo(){
-        System.out.printf("%-15s| W %.1f | %s%n", this.name, this.price, this.description);
+    @Override
+    public String toString(){
+        return String.format("%-15s| W %.1f | %s", this.name, this.price, this.description);
     }
 }

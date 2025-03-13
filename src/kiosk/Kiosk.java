@@ -17,6 +17,7 @@ public class Kiosk {
     //현재 키오스크의 상태를 나타내는 변수
     private boolean isProcessing;
     private boolean isOrdering;     //메뉴를 선택 중인가? 주문하려는 상태인가?
+    private boolean isDelete;
     private int step;           //진행 단계
     private int categorySave;  //선택된 카테고리
     private int menuItemSave;  //선택된 메뉴
@@ -27,6 +28,7 @@ public class Kiosk {
         cart = new Cart();
         isProcessing = true;
         isOrdering = false;
+        isDelete = false;
         step = 1;
         categorySave = 0;
         menuItemSave = 0;
@@ -52,7 +54,7 @@ public class Kiosk {
             case 2:
                 if(isOrdering){
                     minInput = 1;
-                    maxInput = 2;
+                    maxInput = 3;
                 }else{
                     minInput = 0;
                     maxInput = category.get(categorySave).getListSize();
@@ -63,6 +65,9 @@ public class Kiosk {
                 maxInput = 2;
                 if(isOrdering){
                     maxInput = DiscountType.values().length;
+                    if(isDelete){
+                        maxInput = cart.getCartSize();
+                    }
                 }
                 break;
             default:
@@ -105,13 +110,8 @@ public class Kiosk {
                 isOrdering = true;
                 categorySave = choice-1;
                 System.out.println("아래와 같이 주문하시겠습니까?");
-                System.out.println("[ " + "Orders" + " ]");
-                for (int i = 0; i < cart.getCartSize(); i++) {
-                    cart.getCartItem(i).printMenuItemInfo();
-                }
-                System.out.println("[ " + "Total" + " ]");
-                System.out.printf("W %.1f%n%n", cart.getTotalPrice());
-                System.out.println("1. 주문    2. 메뉴판");
+                cart.printCartList();
+                System.out.println("1. 주문    2. 메뉴판    3. 삭제");
             }
             else if (choice == category.size() + 2) { //주문을 종료
                 isProcessing = false;
@@ -120,6 +120,7 @@ public class Kiosk {
         } else {
             categorySave = choice-1;
             category.get(categorySave).printMenuList(); //카테고리 내 메뉴 선택지 출력
+            isOrdering = false;
         }
     }
 
@@ -141,22 +142,37 @@ public class Kiosk {
                 step = 1;
                 throw new ContinueException();
             }
+            else{
+                isDelete = true;
+                cart.printCartList();
+                System.out.println("삭제할 메뉴의 번호를 입력해주세요");
+            }
         } else {
             //선택된 주문 출력 후, 장바구니에 추가할지 여부 묻기
             menuItemSave = choice-1;
-            category.get(categorySave).getMenuItem(menuItemSave).printMenuItemInfo();
+            System.out.println(category.get(categorySave).getMenuItem(menuItemSave));
             System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
             System.out.println("1. 확인    2. 취소");
         }
     }
 
-    //step 4: 장바구니에 넣기 or 결제하기
+    //step 4: 장바구니에 넣기 or 결제하기 or 삭제하기
     public void step4(int choice) {
         if (isOrdering) {
-            //할인이 적용된 금액에 따라 결제
-            cart.applyDiscount(DiscountType.fromIndex(choice-1).getRate());
-            System.out.printf("주문이 완료되었습니다. 금액은 W %.1f 입니다.%n", cart.getTotalPrice());
-            isProcessing = false;
+            if(isDelete){
+                cart.deleteItemInCart(choice);
+                cart.printCartList();
+                System.out.println();
+                step=2;
+                categorySave = category.size()+1;
+                isDelete = false;
+            }
+            else{
+                //할인이 적용된 금액에 따라 결제
+                cart.applyDiscount(DiscountType.fromIndex(choice-1).getRate());
+                System.out.printf("주문이 완료되었습니다. 금액은 W %.1f 입니다.%n", cart.getTotalPrice());
+                isProcessing = false;
+            }
         } else {
             step = 1;
             if (choice == 1) { //장바구니에 넣기
