@@ -21,7 +21,7 @@ public class Main {
 
         //Kiosk 객체 생성
         Kiosk kiosk = new Kiosk();
-        //Menu를 Kiost의 Menu 리스트에 저장
+        //Menu를 Kiosk의 Menu 리스트에 저장
         kiosk.addCategory(burgerMenu);
         kiosk.addCategory(drinkMenu);
         kiosk.addCategory(dessertMenu);
