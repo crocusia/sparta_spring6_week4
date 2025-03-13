@@ -28,4 +28,14 @@ public class Menu {
     public void addMenu(MenuItem item){
         this.menuList.add(item);
     }
+
+    //카테고리 내의 메뉴들을 출력하는 메서드
+    public void printMenuList() {
+        System.out.println("[ " + category + " MENU" + " ]");
+        for (int i = 1; i < menuList.size() + 1; i++) {
+            System.out.printf("%d. ", i);
+            menuList.get(i - 1).printMenuItemInfo();
+        }
+        System.out.println("0. 뒤로가기");
+    }
 }

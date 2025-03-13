@@ -38,16 +38,6 @@ public class Kiosk {
         this.category.add(menu);
     }
 
-    //카테고리 내의 메뉴들을 출력하는 메서드
-    public void printMenuList(Menu menu) {
-        System.out.println("[ " + menu.getCategory() + " MENU" + " ]");
-        for (int i = 1; i < menu.getListSize() + 1; i++) {
-            System.out.printf("%d. ", i);
-            menu.getMenuItem(i - 1).printMenuItemInfo();
-        }
-        System.out.println("0. 뒤로가기");
-    }
-
     public void checkValidInput(int input){
         int minInput;
         int maxInput;
@@ -129,7 +119,7 @@ public class Kiosk {
             }
         } else {
             categorySave = choice-1;
-            printMenuList(category.get(categorySave)); //카테고리 내 메뉴 선택지 출력
+            category.get(categorySave).printMenuList(); //카테고리 내 메뉴 선택지 출력
         }
     }
 
