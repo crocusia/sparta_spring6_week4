@@ -1,198 +1,191 @@
 package kiosk;
 
-import java.awt.*;
+import com.sun.jdi.ObjectReference;
+import kiosk.domain.Menu;
+import kiosk.utill.Cart;
+import kiosk.utill.DiscountType;
+import kiosk.utill.Order;
+import kiosk.utill.Pay;
+
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 class ContinueException extends RuntimeException{} //메서드 내에서 continue와 같은 효과를 내기 위한 예외 생성
 
 public class Kiosk {
 
     private List<Menu> category;    //MenuItem을 관리하는 리스트
-    private Cart cart;              //장바구니 기능
+    private Order order;            //주문받는 기능을 담당하는 클래스
+    private Pay pay;                //장바구니를 포함한 결제 기능을 담당하는 클래스
 
     //현재 키오스크의 상태를 나타내는 변수
     private boolean isProcessing;
-    private boolean isOrdering;     //메뉴를 선택 중인가? 주문하려는 상태인가?
+    private boolean isPaying;
     private boolean isDelete;
     private int step;           //진행 단계
-    private int categorySave;  //선택된 카테고리
-    private int menuItemSave;  //선택된 메뉴
 
-    //Kiosk 객체 생성 시, 값을 넘겨줌
+    //선택 저장
+    int chooseCategory = 0;
+    int chooseMenuItem = 0;
+    int choosePayProcess = 0;
+
+    //Kiosk 객체 생성
     public Kiosk() {
         category = new ArrayList<>();
-        cart = new Cart();
+        order = new Order();
+        pay = new Pay();
+
         isProcessing = true;
-        isOrdering = false;
+        isPaying = false;
         isDelete = false;
         step = 1;
-        categorySave = 0;
-        menuItemSave = 0;
     }
 
     //setter
-    //카테고리에 MenuItem을 추가
     public void addCategory(Menu menu) {
         this.category.add(menu);
     }
 
-    public void checkValidInput(int input){
-        int minInput;
-        int maxInput;
-        switch(step){ //각 단계에 따른 입력 범위 설정
-            case 1:
-                minInput = 0;
-                maxInput = category.size();
-                if(cart.getCartSize() > 0){
-                    maxInput = category.size()+2;
-                }
-                break;
-            case 2:
-                if(isOrdering){
-                    minInput = 1;
-                    maxInput = 3;
-                }else{
-                    minInput = 0;
-                    maxInput = category.get(categorySave).getListSize();
-                }
-                break;
-            case 3:
-                minInput = 1;
-                maxInput = 2;
-                if(isOrdering){
-                    maxInput = DiscountType.values().length;
-                    if(isDelete){
-                        maxInput = cart.getCartSize();
-                    }
-                }
-                break;
-            default:
-                throw new ContinueException();
-        }
-
-        if (input >= minInput && input <= maxInput) {
-            if(input == 0){
+    //유효한 입력인지 확인하는 메서드
+    public void checkValidInput(int minInput, int maxInput, int input){
+        if(input >= minInput && input <= maxInput){
+            if(input == 0){ //0 입력 시 뒤로가기
                 step--;
-                if(step == 0){
+                if(step == 1){ //step1일 때, 0이 입력되면 종료
                     isProcessing = false;
                 }
-            }else{
-                step++;
+                throw new ContinueException();
             }
         }
         else{
             throw new IndexOutOfBoundsException();
         }
     }
+
+    //예외 발생으로 이전 단계 복귀 시, 이전 선택지 복원
+    public int setChoice(int choice){
+        if (isPaying) {
+            return choosePayProcess;
+        }
+        switch (step){
+            case 2 :
+                return chooseCategory + 1;
+            case 3 :
+                return chooseMenuItem+1;
+        }
+        return choice;
+    }
     //step1 : 카테고리 선택지(+Order Menu 선택지)
     public void step1() {
-        System.out.println("[ " + "MAIN MENU" + " ]");
-        for (int i = 1; i < category.size() + 1; i++) {
-            System.out.printf("%d. %s%n", i, category.get(i - 1).getCategory());
-        }
-        System.out.println("0. 종료");
+        //메인 메뉴 출력
+        order.printMainMenu(category);
         //장바구니가 비어있지 않다면, 결제를 위한 선택지 출력
-        if (cart.getCartSize() > 0) {
-            System.out.printf("%n[ " + "ORDER MENU" + " ]%n");
-            System.out.printf("%d. %-15s| %s%n", category.size() + 1, "Orders", "장바구니를 확인 후 주문합니다.");
-            System.out.printf("%d. %-15s| %s%n", category.size() + 2, "Cancel", "진행중인 주문을 취소합니다.");
+        if (!pay.cartIsEmpty()) {
+            pay.askStartPaying(category.size());
         }
     }
 
     //step 2: 카테고리 내 메뉴 선택지 or 장바구니 정보 출력 후 선택지
     public void step2(int choice) {
-        if (cart.getCartSize() > 0 && choice > category.size()) { //장바구니에 메뉴가 들어있다면 주문 가능한 상태
+        checkValidInput(0, category.size()+2, choice);
+        if (!pay.cartIsEmpty() && choice > category.size()) { //장바구니에 메뉴가 들어있다면 주문 가능한 상태
             if (choice == category.size()+1) {
-                isOrdering = true;
-                categorySave = choice-1;
-                System.out.println("아래와 같이 주문하시겠습니까?");
-                cart.printCartList();
-                System.out.println("1. 주문    2. 메뉴판    3. 삭제");
+                isPaying = true; //결제 진행 중인 상태로 변경
+                choosePayProcess = choice;
+                pay.askPayingProcess(); //장바구니 정보 출력 후 선택지
+                step++;
             }
-            else if (choice == category.size() + 2) { //주문을 종료
+            else if (choice == category.size() + 2) { //키오스크 종료
                 isProcessing = false;
                 throw new ContinueException();
             }
-        } else {
-            categorySave = choice-1;
-            category.get(categorySave).printMenuList(); //카테고리 내 메뉴 선택지 출력
-            isOrdering = false;
+        }
+        else { //0부터 5까지 받아도 5입력되면 자동으로 그거 할 걸?
+            chooseCategory = choice - 1;
+            order.printCategoryMenu(category.get(chooseCategory)); //카테고리 내 메뉴 선택지 출력
+            step++;
         }
     }
 
     //step 3: 장바구니에 추가 여부 or 결제 시 할인 정보 입력
     public void step3(int choice) {
-        if (isOrdering) {
-            if(choice == 1){
-                menuItemSave = choice-1;
-                //결제 시 할인 정보 입력
-                System.out.println("할인 정보를 입력해주세요.");
-                int i = 1;
-                for(DiscountType discountType : DiscountType.values()){
-                    System.out.printf("%d. %-7s : %d%%%n", i, discountType.getName(), discountType.getRate());
-                    i++;
-                }
+        if (isPaying) {
+            checkValidInput(1, 3, choice);
+            step++;
+            choosePayProcess = choice;
+            switch (choice){
+                case 1 :
+                    pay.askDiscount();  //할인 유형 묻기
+                    break;
+                case 2 :
+                    step = 1;           //메인 메뉴로 돌아가기
+                    isPaying = false;   //결제 중인 상황 아님
+                    throw new ContinueException();
+                case 3:
+                    pay.askDeleteItem(); //어떤 아이템을 삭제할건지 묻기
+                    isDelete = true;
+                    break;
+                default:
+                    break;
             }
-            else if(choice ==2){
-                isOrdering = false;
-                step = 1;
-                throw new ContinueException();
-            }
-            else{
-                isDelete = true;
-                cart.printCartList();
-                System.out.println("삭제할 메뉴의 번호를 입력해주세요");
-            }
-        } else {
+        }
+        else {
+            checkValidInput(0, category.get(chooseCategory).getListSize(), choice);
+            step++;
+            chooseMenuItem = choice-1;
             //선택된 주문 출력 후, 장바구니에 추가할지 여부 묻기
-            menuItemSave = choice-1;
-            System.out.println(category.get(categorySave).getMenuItem(menuItemSave));
-            System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
-            System.out.println("1. 확인    2. 취소");
+            order.askChooseItem(category.get(chooseCategory).getMenuItem(chooseMenuItem));
         }
     }
 
     //step 4: 장바구니에 넣기 or 결제하기 or 삭제하기
     public void step4(int choice) {
-        if (isOrdering) {
+        if (isPaying) {
             if(isDelete){
-                cart.deleteItemInCart(choice);
-                cart.printCartList();
-                System.out.println();
-                step=2;
-                categorySave = category.size()+1;
-                isDelete = false;
+                checkValidInput(1, pay.cartSize(), choice);
+                pay.deleteItem(choice-1);
+                isDelete = false;  //삭제 단계 아님으로 변경
+                if(pay.cartIsEmpty()){ // 삭제 후, 장바구니가 비어있다면
+                    step = 1;          //메인 메뉴 출력으로 돌아가기
+                    isPaying = false;  //결제 진행 중이 아닌 상태로 변경
+                    throw new ContinueException();
+                }
+                else{                       //장바구니가 비어있지 않다면
+                    pay.askPayingProcess(); //장바구니 정보 출력 후 선택지
+                    step = 3;
+                }
             }
             else{
                 //할인이 적용된 금액에 따라 결제
-                cart.applyDiscount(DiscountType.fromIndex(choice-1).getRate());
-                System.out.printf("주문이 완료되었습니다. 금액은 W %.1f 입니다.%n", cart.getTotalPrice());
+                pay.completePaying(DiscountType.fromIndex(choice-1).getRate());
                 isProcessing = false;
+                throw new ContinueException();
             }
         } else {
+            checkValidInput(1, 2, choice);
             step = 1;
             if (choice == 1) { //장바구니에 넣기
-                cart.addItemToCart(category.get(categorySave).getMenuItem(menuItemSave));
-                System.out.printf("%n아래 메뉴판을 보시고 메뉴를 골라 입력해주세요.%n%n");
+                pay.addItemToCart(category.get(chooseCategory).getMenuItem(chooseMenuItem));
+                System.out.printf("%n아래 메뉴판을 보고 메뉴를 골라 입력해주세요.%n%n");
             }
+            throw new ContinueException();
         }
     }
 
     //main에서 관리하던 입력과 반복문 로직 관리
     public void start() {
         Scanner input = new Scanner(System.in);
-        int choice = -1;
         //반복문을 이용해 0 입력 시, 프로그램 종료
+        int choice = 0;
         while (isProcessing) {
             try {
                 //단계에 따른 출력
                 switch (step) {
                     case 1:
                         step1();
+                        step++;
                         break;
                     case 2:
                         step2(choice);
@@ -202,32 +195,25 @@ public class Kiosk {
                         break;
                     case 4:
                         step4(choice);
-                        continue;
                     default:
                         break;
                 }
-
                 //입력 받기 & 개행 문자 제거
                 choice = input.nextInt();
                 input.nextLine();
                 System.out.println();
-
-                //입력 확인
-                checkValidInput(choice);
-
             } catch (InputMismatchException e) { //예외 처리
-                System.out.println("잘못된 형식의 입력입니다.");
+                System.out.printf("잘못된 형식의 입력입니다.%n%n");
                 input.nextLine();
+                step--;
+                choice = setChoice(choice);
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("해당 값은 선택할 수 없습니다.");
-                if(step == 2){ //각 단계에 따라 이전 선택지 복원
-                    choice = categorySave+1;
-                }
-                else if(step == 3){
-                    choice = menuItemSave+1;
-                }
+                System.out.printf("해당 값은 선택할 수 없습니다.%n%n");
+                step--;
+                choice = setChoice(choice);
             } catch (ContinueException e){
                 //빠져나오기 용
+                choice = setChoice(choice);
             }
             catch (Exception e) {
                 System.out.println("알 수 없는 오류입니다." + e);

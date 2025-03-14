@@ -1,4 +1,4 @@
-package kiosk;
+package kiosk.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,11 @@ public class Menu {
         this.menuList.add(item);
     }
 
-    //카테고리 내의 메뉴들을 출력하는 메서드
+    //카테고리 내 메뉴 출력 메서드
     public void printMenuList() {
         System.out.println("[ " + category + " MENU" + " ]");
         for (int i = 1; i <= menuList.size(); i++) {
-            System.out.println(i + ". " + menuList.get(i-1));
+            System.out.println(i + ". " + menuList.get(i - 1));
         }
-        System.out.println("0. 뒤로가기");
     }
 }

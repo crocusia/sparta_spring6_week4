@@ -1,8 +1,7 @@
 package kiosk;
 
-import jdk.jshell.SourceCodeAnalysis;
-
-import java.util.Scanner;
+import kiosk.domain.Menu;
+import kiosk.domain.MenuItem;
 
 public class Main {
     public static void main(String[] args){

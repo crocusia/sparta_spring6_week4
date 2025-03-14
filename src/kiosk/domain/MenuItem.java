@@ -1,6 +1,4 @@
-package kiosk;
-
-import javax.lang.model.type.NullType;
+package kiosk.domain;
 
 public class MenuItem {
     //캡슐화 - 이름, 가격, 설명 필드
