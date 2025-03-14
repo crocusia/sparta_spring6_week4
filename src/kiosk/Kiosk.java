@@ -1,11 +1,9 @@
 package kiosk;
 
-import com.sun.jdi.ObjectReference;
 import kiosk.domain.Menu;
-import kiosk.utill.Cart;
-import kiosk.utill.DiscountType;
-import kiosk.utill.Order;
-import kiosk.utill.Pay;
+import kiosk.util.DiscountType;
+import kiosk.util.Order;
+import kiosk.util.Pay;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;

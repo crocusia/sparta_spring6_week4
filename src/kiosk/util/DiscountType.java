@@ -1,4 +1,4 @@
-package kiosk.utill;
+package kiosk.util;
 
 public enum DiscountType {
     PATRIOT(10, "국가유공자"), SOLDIER(5, "군인"), STUDENT(3, "학생"), NORMAL(0, "일반");
