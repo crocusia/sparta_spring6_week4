@@ -5,18 +5,19 @@ public enum DiscountType {
 
     private int rate;
     private String name;
-
+    //생성자
     DiscountType(int rate, String name){
         this.rate = rate;
         this.name = name;
     }
-
+    //getter
     public int getRate(){
         return rate;
     }
     public String getName(){
         return name;
     }
+    //index 위치의 DiscountType 반환
     public static DiscountType fromIndex(int index){
         DiscountType[] values = values();
         return values[index];
