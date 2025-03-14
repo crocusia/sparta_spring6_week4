@@ -1,4 +1,4 @@
-package kiosk.utill;
+package kiosk.util;
 
 import kiosk.domain.MenuItem;
 
